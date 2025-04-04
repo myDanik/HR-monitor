@@ -1,0 +1,95 @@
+Table users {
+  id int [pk, increment]
+  email varchar(255) [not null, unique]
+  password_hash varchar(255) [not null]
+  role user_role [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table vacancies {
+  id int [pk, increment]
+  title varchar(255) [not null]
+  description text
+  status vacancy_status [default: 'opened']
+  created_by int [not null, ref: > users.id]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+
+Table stages {
+  id int [pk, increment]
+  name resume_stages [not null, unique]
+  
+}
+
+Table sla_rules {
+  id int [pk, increment]
+  vacancy_id int [not null, ref: > vacancies.id]
+  stage_id int [not null, ref: > stages.id]
+  duration_hours int [not null]
+  created_by int [not null, ref: > users.id]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    (stage_id, vacancy_id) [unique]
+    
+  }
+}
+
+Table resumes {
+  id int [pk, increment]
+  vacancy_id int [not null, ref: > vacancies.id]
+  current_stage_id int [not null, ref: > stages.id]
+  candidate_name varchar(255) [not null]
+  candidate_contact text [not null]
+  source varchar(255) [not null]
+  description text [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    vacancy_id
+    current_stage_id
+  }
+}
+
+Table resume_histories {
+  id int [pk, increment]
+  resume_id int [not null, ref: > resumes.id]
+  stage_id int [not null, ref: > stages.id]
+  start_time timestamp [not null, default: `now()`]
+  end_time timestamp
+  user_id int [not null, ref: > users.id]
+  
+  indexes {
+    resume_id
+    stage_id
+  }
+}
+
+enum vacancy_status {
+  opened
+  closed
+}
+
+enum user_role {
+  hr
+  team_lead_hr
+}
+
+enum resume_stages{
+  opened
+  studied
+  interview
+  passed_interview
+  technical_interview_scheduled
+  technical_interview_passed
+  offer_sent
+}
+
+
+
+Ref: "stages"."id" < "stages"."name"
