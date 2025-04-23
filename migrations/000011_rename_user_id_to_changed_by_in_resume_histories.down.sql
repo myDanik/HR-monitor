@@ -1,0 +1,1 @@
+ALTER TABLE resume_histories RENAME COLUMN changed_by TO user_id;

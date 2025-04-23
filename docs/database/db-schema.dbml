@@ -5,6 +5,7 @@ Table users {
   role user_role [not null]
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
+  name varchar(255) [not null, default: '']
 }
 
 Table vacancies {
@@ -49,6 +50,7 @@ Table resumes {
   description text [not null]
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
+  sladeadline temestamp [not null]
   
   indexes {
     vacancy_id
@@ -62,7 +64,7 @@ Table resume_histories {
   stage_id int [not null, ref: > stages.id]
   start_time timestamp [not null, default: `now()`]
   end_time timestamp
-  user_id int [not null, ref: > users.id]
+  changed_by int [not null, ref: > users.id]
   
   indexes {
     resume_id
