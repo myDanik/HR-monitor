@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type postgresStatsRepository struct{
+type postgresStatsRepository struct {
 	db *pgxpool.Pool
 }
 
@@ -92,9 +92,70 @@ func (r *postgresStatsRepository) GetSourceDistribution(ctx context.Context) (ma
 }
 
 func (r *postgresStatsRepository) GetAverageCandidatesPerVacancy(ctx context.Context) (float64, error) {
-	return 0, nil
+	query := `
+	SELECT AVG(candidate_count) as avg_candidates_per_vacancy
+	FROM (
+		SELECT v.id, COUNT(r.id) as candidate_count
+		FROM vacancies v
+		LEFT JOIN resumes r ON v.id = r.vacancy_id
+		GROUP BY v.id
+	) as vacancy_counts
+	`
+	var avgCandidatesPerVacancy float64
+	err := r.db.QueryRow(ctx, query).Scan(&avgCandidatesPerVacancy)
+	if err != nil {
+		return avgCandidatesPerVacancy, err
+	}
+	return avgCandidatesPerVacancy, nil
+
 }
 
-func (r *postgresStatsRepository) GetSLAViolationsCount(ctx context.Context) (int, error) {
-	return 0, nil
+func (r *postgresStatsRepository) GetHistoricalSLAViolationsCount(ctx context.Context) (int, error) {
+	query := `
+	SELECT COUNT(*) AS historical_sla_violations_count
+	FROM (
+		SELECT 
+			rh.resume_id,
+			rh.stage_id,
+			EXTRACT(EPOCH FROM (rh.end_time - rh.start_time)) / 3600 AS hours_spent,
+			sr.duration_hours AS allowed_hours
+		FROM resume_histories rh
+		JOIN resumes r ON rh.resume_id = r.id
+		JOIN sla_rules sr 
+			ON rh.stage_id = sr.stage_id 
+			AND r.vacancy_id = sr.vacancy_id
+		WHERE 
+			rh.end_time IS NOT NULL
+	) AS violations
+	WHERE hours_spent > allowed_hours
+	`
+	var slaViolationsCount int
+	err := r.db.QueryRow(ctx, query).Scan(&slaViolationsCount)
+	if err != nil {
+		return 0, err
+	}
+	return slaViolationsCount, nil
+}
+
+func (r *postgresStatsRepository) GetCurrentSLAViolationsCount(ctx context.Context) (int, error) {
+	query := `
+	SELECT COUNT(*) AS current_sla_violations_count
+	FROM (
+		SELECT 
+			r.id AS resume_id,
+			r.current_stage_id AS stage_id,
+			EXTRACT(EPOCH FROM (NOW() - r.updated_at)) / 3600 AS hours_spent,
+			sr.duration_hours AS allowed_hours
+		FROM resumes r
+		JOIN sla_rules sr ON r.current_stage_id = sr.stage_id AND r.vacancy_id = sr.vacancy_id
+		WHERE r.updated_at IS NOT NULL
+	) AS current_violations
+	WHERE hours_spent > allowed_hours
+	`
+	var slaViolationsCount int
+	err := r.db.QueryRow(ctx, query).Scan(&slaViolationsCount)
+	if err != nil {
+		return 0, err
+	}
+	return slaViolationsCount, nil
 }

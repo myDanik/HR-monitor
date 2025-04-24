@@ -9,5 +9,6 @@ type StatsRepository interface {
 	GetStageDistribution(ctx context.Context) (map[string]int, error)
 	GetSourceDistribution(ctx context.Context) (map[string]int, error)
 	GetAverageCandidatesPerVacancy(ctx context.Context) (float64, error)
-	GetSLAViolationsCount(ctx context.Context) (int, error)
+	GetHistoricalSLAViolationsCount(ctx context.Context) (int, error)
+	GetCurrentSLAViolationsCount(ctx context.Context) (int, error)
 }

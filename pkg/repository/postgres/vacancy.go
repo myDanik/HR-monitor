@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"HR-monitor/pkg/enums"
 	"HR-monitor/pkg/models"
 	"HR-monitor/pkg/repository"
 	"context"
@@ -69,7 +70,7 @@ func (r *postgresVacancyRepository) UpdateVacancy(ctx context.Context, vacancy m
 	updated_at = $7
 	WHERE id = $1
 	`
-	_, err := r.db.Exec(ctx, query, 
+	_, err := r.db.Exec(ctx, query,
 		vacancy.ID,
 		vacancy.Title,
 		vacancy.Description,
@@ -95,5 +96,18 @@ func (r *postgresVacancyRepository) DeleteVacancy(ctx context.Context, id int) e
 		return err
 	}
 	return nil
-	
+
+}
+
+func (r *postgresVacancyRepository) ChangeVacancyStatus(ctx context.Context, id int, status enums.VacancyStatus) error {
+	query := `
+	UPDATE vacancies
+	SET status = $2
+	WHERE id = $1
+	`
+	_, err := r.db.Exec(ctx, query, id, status)
+	if err != nil {
+		return err
+	}
+	return nil
 }
