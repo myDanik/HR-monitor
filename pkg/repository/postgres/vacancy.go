@@ -111,3 +111,5 @@ func (r *postgresVacancyRepository) ChangeVacancyStatus(ctx context.Context, id 
 	}
 	return nil
 }
+
+

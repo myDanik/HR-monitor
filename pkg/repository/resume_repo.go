@@ -12,5 +12,5 @@ type ResumeRepository interface {
 	UpdateResumeByID(ctx context.Context, resume models.Resume) error
 	DeleteResumeByID(ctx context.Context, id int) error
 	MoveResumeToStage(ctx context.Context, resumeID, stageID int) error
+	AddResumeHistory(ctx context.Context, resume models.Resume, userID int) error
 }
-

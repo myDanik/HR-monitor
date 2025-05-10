@@ -15,15 +15,16 @@ func NewPostgresStatsRepository(db *pgxpool.Pool) repository.StatsRepository {
 	return &postgresStatsRepository{db: db}
 }
 
-func (r *postgresStatsRepository) GetAverageStageTime(ctx context.Context, stageID int) (float64, error) {
+func (r *postgresStatsRepository) GetAverageStageTime(ctx context.Context) (float64, error) {
 	query := `
 	SELECT AVG(EXTRACT(EPOCH FROM (end_time - start_time)) / 3600) AS avg_hours
 	FROM resume_histories
 	WHERE end_time IS NOT NULL
-	AND stage_id = $1
+	GROUP BY stage_id
+
 	`
 	var avgHours float64
-	err := r.db.QueryRow(ctx, query, stageID).Scan(&avgHours)
+	err := r.db.QueryRow(ctx, query).Scan(&avgHours)
 	if err != nil {
 		return 0, err
 	}
