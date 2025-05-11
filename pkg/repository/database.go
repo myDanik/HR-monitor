@@ -10,7 +10,7 @@ import (
 
 var dbPool *pgxpool.Pool
 
-func InitDB(ctx context.Context, config config.Config) error{
+func InitDB(ctx context.Context, config config.Config) error {
 	connString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		config.DB.User,
 		config.DB.Password,
@@ -24,18 +24,18 @@ func InitDB(ctx context.Context, config config.Config) error{
 	}
 	dbPool, err = pgxpool.NewWithConfig(ctx, poolConfig)
 	if err != nil {
-		return fmt.Errorf( "error creating connection pool: %w", err)
+		return fmt.Errorf("error creating connection pool: %w", err)
 	}
-	
+
 	return dbPool.Ping(ctx)
 }
 
 func GetDB() *pgxpool.Pool {
-    return dbPool
+	return dbPool
 }
 
 func CloseDB() {
-    if dbPool != nil {
-        dbPool.Close()
-    }
+	if dbPool != nil {
+		dbPool.Close()
+	}
 }

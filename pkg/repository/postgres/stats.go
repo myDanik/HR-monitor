@@ -139,20 +139,27 @@ func (r *postgresStatsRepository) GetHistoricalSLAViolationsCount(ctx context.Co
 }
 
 func (r *postgresStatsRepository) GetCurrentSLAViolationsCount(ctx context.Context) (int, error) {
+	// query := `
+	// SELECT COUNT(*) AS current_sla_violations_count
+	// FROM (
+	// 	SELECT
+	// 		r.id AS resume_id,
+	// 		r.current_stage_id AS stage_id,
+	// 		EXTRACT(EPOCH FROM (NOW() - r.updated_at)) / 3600 AS hours_spent,
+	// 		sr.duration_hours AS allowed_hours
+	// 	FROM resumes r
+	// 	JOIN sla_rules sr ON r.current_stage_id = sr.stage_id AND r.vacancy_id = sr.vacancy_id
+	// 	WHERE r.updated_at IS NOT NULL
+	// ) AS current_violations
+	// WHERE hours_spent > allowed_hours
+
+	// `
 	query := `
 	SELECT COUNT(*) AS current_sla_violations_count
-	FROM (
-		SELECT 
-			r.id AS resume_id,
-			r.current_stage_id AS stage_id,
-			EXTRACT(EPOCH FROM (NOW() - r.updated_at)) / 3600 AS hours_spent,
-			sr.duration_hours AS allowed_hours
-		FROM resumes r
-		JOIN sla_rules sr ON r.current_stage_id = sr.stage_id AND r.vacancy_id = sr.vacancy_id
-		WHERE r.updated_at IS NOT NULL
-	) AS current_violations
-	WHERE hours_spent > allowed_hours
+	FROM resumes r
+	WHERE r.sla_deadline < NOW()
 	`
+
 	var slaViolationsCount int
 	err := r.db.QueryRow(ctx, query).Scan(&slaViolationsCount)
 	if err != nil {

@@ -75,6 +75,11 @@ func (h *VacancyHandler) DeleteVacancy(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *VacancyHandler) ChangeVacancyStatus(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	id := r.URL.Query().Get("id")
 	if id == "" {
 		http.Error(w, "ID is required", http.StatusBadRequest)

@@ -12,7 +12,7 @@ type SLAHandler struct {
 	SLAService *service.SLAService
 }
 
-func NewSLAService(SLAService *service.SLAService) *SLAHandler {
+func NewSLAHandler(SLAService *service.SLAService) *SLAHandler {
 	return &SLAHandler{
 		SLAService: SLAService,
 	}
@@ -99,4 +99,3 @@ func (h *SLAHandler) DeleteSLARule(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 }
-

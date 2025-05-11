@@ -10,5 +10,5 @@ type SLARepository interface {
 	GetSLARulesByVacancyID(ctx context.Context, vacancyID int) ([]models.SLARule, error)
 	UpdateSLARule(ctx context.Context, rule models.SLARule) error
 	DeleteSLARuleByID(ctx context.Context, id int) error
+	GetSLARuleByStageAndVacancy(ctx context.Context, stageID, vacancyID int) (models.SLARule, error)
 }
-

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"HR-monitor/pkg/auth"
 	"HR-monitor/pkg/models"
 	"HR-monitor/pkg/repository"
 	"context"
@@ -20,6 +21,11 @@ func NewSLAService(SLARepo repository.SLARepository) *SLAService {
 func (s *SLAService) CreateSLARule(ctx context.Context, rule models.SLARule) error {
 	rule.CreatedAt = time.Now()
 	rule.UpdatedAt = time.Now()
+	userID, err := auth.GetUserIDFromContext(ctx)
+	if err != nil {
+		return err
+	}
+	rule.CreatedBy = userID
 	return s.SLARepo.CreateSLARule(ctx, rule)
 }
 
@@ -35,4 +41,3 @@ func (s *SLAService) UpdateSLARule(ctx context.Context, rule models.SLARule) err
 func (s *SLAService) DeleteSLARule(ctx context.Context, id int) error {
 	return s.SLARepo.DeleteSLARuleByID(ctx, id)
 }
-

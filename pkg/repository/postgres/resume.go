@@ -76,22 +76,22 @@ func (r *postgresResumeRepository) GetResumes(ctx context.Context, filters model
 	argCount := 1
 
 	if filters.VacancyID != nil {
-		query += fmt.Sprintf(" AND vacancy_id = %d", argCount)
+		query += fmt.Sprintf(" AND vacancy_id = $%d", argCount)
 		args = append(args, *filters.VacancyID)
 		argCount++
 	}
 	if filters.StageID != nil {
-		query += fmt.Sprintf(" AND current_stage_id = %d", argCount)
+		query += fmt.Sprintf(" AND current_stage_id = $%d", argCount)
 		args = append(args, *filters.StageID)
 		argCount++
 	}
 	if filters.DateFrom != nil {
-		query += fmt.Sprintf(" AND created_at >= '%d'", argCount)
+		query += fmt.Sprintf(" AND created_at >= $%d", argCount)
 		args = append(args, *filters.DateFrom)
 		argCount++
 	}
 	if filters.DateTo != nil {
-		query += fmt.Sprintf(" AND created_at <= '%d'", argCount)
+		query += fmt.Sprintf(" AND created_at <= $%d", argCount)
 		args = append(args, *filters.DateTo)
 		argCount++
 	}

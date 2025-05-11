@@ -12,12 +12,14 @@ import (
 type ResumeService struct {
 	resumeRepo repository.ResumeRepository
 	statsRepo  repository.StatsRepository
+	SLARepo    repository.SLARepository
 }
 
-func NewResumeService(resumeRepo repository.ResumeRepository, statsRepo repository.StatsRepository) *ResumeService {
+func NewResumeService(resumeRepo repository.ResumeRepository, statsRepo repository.StatsRepository, SLARepo repository.SLARepository) *ResumeService {
 	return &ResumeService{
 		resumeRepo: resumeRepo,
 		statsRepo:  statsRepo,
+		SLARepo:    SLARepo,
 	}
 }
 
@@ -25,6 +27,7 @@ func (s *ResumeService) CreateResume(ctx context.Context, resume models.Resume) 
 	resume.CurrentStageID = 1
 	resume.CreatedAt = time.Now()
 	resume.UpdatedAt = time.Now()
+
 	return s.resumeRepo.CreateResume(ctx, resume)
 }
 
@@ -49,6 +52,14 @@ func (s *ResumeService) MoveResumeToStage(ctx context.Context, resumeID, stageID
 	if err != nil {
 		return err
 	}
+
+	slaRule, err := s.SLARepo.GetSLARuleByStageAndVacancy(ctx, stageID, resume.VacancyID)
+	if err != nil {
+		return err
+	}
+
+	resume.SLADeadline = time.Now().Add(time.Duration(slaRule.DurationHours) * time.Hour)
+	resume.CurrentStageID = stageID
 
 	return s.resumeRepo.MoveResumeToStage(ctx, resumeID, stageID)
 }

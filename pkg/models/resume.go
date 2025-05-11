@@ -6,16 +6,16 @@ import (
 )
 
 type Resume struct {
-	ID               int           `json:"id" db:"id"`
-	VacancyID        int           `json:"vacancy_id" db:"vacancy_id"`
-	CurrentStageID   int           `json:"current_stage_id" db:"current_stage_id"`
-	CandidateName    string        `json:"candidate_name" db:"candidate_name"`
-	CandidateContact string        `json:"candidate_contact" db:"candidate_contact"`
-	Source           string        `json:"source" db:"source"`
-	Description      string        `json:"description" db:"description"`
-	CreatedAt        time.Time     `json:"created_at" db:"created_at"`
-	UpdatedAt        time.Time     `json:"updated_at" db:"updated_at"`
-	SLADeadline      time.Duration `json:"sla_deadline" db:"sla_deadline,type:interval"`
+	ID               int       `json:"id" db:"id"`
+	VacancyID        int       `json:"vacancy_id" db:"vacancy_id"`
+	CurrentStageID   int       `json:"current_stage_id" db:"current_stage_id"`
+	CandidateName    string    `json:"candidate_name" db:"candidate_name"`
+	CandidateContact string    `json:"candidate_contact" db:"candidate_contact"`
+	Source           string    `json:"source" db:"source"`
+	Description      string    `json:"description" db:"description"`
+	CreatedAt        time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at" db:"updated_at"`
+	SLADeadline      time.Time `json:"sla_deadline" db:"sla_deadline"`
 }
 
 type ResumeSort struct {
