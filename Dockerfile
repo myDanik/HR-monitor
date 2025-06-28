@@ -1,7 +1,5 @@
 FROM golang:1.24.2-alpine
 
-EXPOSE 8080
-
 WORKDIR /app
 
 COPY go.mod go.sum ./
@@ -12,6 +10,6 @@ COPY .env ./
 
 COPY . .
 
-RUN go build -o main cmd/main.go
+RUN go build cmd/main.go
 
 CMD ["./main"]

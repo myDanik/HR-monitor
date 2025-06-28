@@ -50,7 +50,7 @@ Table resumes {
   description text [not null]
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
-  sladeadline temestamp [not null]
+  sladeadline timestamp [not null]
   
   indexes {
     vacancy_id

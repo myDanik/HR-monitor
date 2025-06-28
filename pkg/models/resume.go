@@ -15,7 +15,7 @@ type Resume struct {
 	Description      string    `json:"description" db:"description"`
 	CreatedAt        time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt        time.Time `json:"updated_at" db:"updated_at"`
-	SLADeadline      time.Time `json:"sla_deadline" db:"sla_deadline"`
+	SLADeadline      time.Time `json:"sla_deadline" db:"sladeadline"`
 }
 
 type ResumeSort struct {

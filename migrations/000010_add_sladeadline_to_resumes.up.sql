@@ -1,2 +1,2 @@
 ALTER TABLE resumes
-ADD COLUMN sladeadline timestamp NOT NULL;
+ADD COLUMN sladeadline timestamp DEFAULT (now());

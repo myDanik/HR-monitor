@@ -2,8 +2,10 @@ package postgres
 
 import (
 	"HR-monitor/pkg/models"
+	"HR-monitor/pkg/repository"
 	"context"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -120,6 +122,9 @@ func (r *postgresSLARepository) GetSLARuleByStageAndVacancy(ctx context.Context,
 		&rule.UpdatedAt,
 	)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			return models.SLARule{}, repository.ErrNotFound
+		}
 		return models.SLARule{}, err
 	}
 	return rule, nil

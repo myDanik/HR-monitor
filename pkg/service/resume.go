@@ -28,6 +28,15 @@ func (s *ResumeService) CreateResume(ctx context.Context, resume models.Resume) 
 	resume.CreatedAt = time.Now()
 	resume.UpdatedAt = time.Now()
 
+	slaRule, err := s.SLARepo.GetSLARuleByStageAndVacancy(ctx, resume.CurrentStageID, resume.VacancyID)
+	if err == repository.ErrNotFound {
+		resume.SLADeadline = time.Now().Add(24 * time.Hour)
+	} else if err != nil {
+		return err
+	} else {
+		resume.SLADeadline = time.Now().Add(time.Duration(slaRule.DurationHours) * time.Hour)
+	}
+
 	return s.resumeRepo.CreateResume(ctx, resume)
 }
 
@@ -54,14 +63,18 @@ func (s *ResumeService) MoveResumeToStage(ctx context.Context, resumeID, stageID
 	}
 
 	slaRule, err := s.SLARepo.GetSLARuleByStageAndVacancy(ctx, stageID, resume.VacancyID)
-	if err != nil {
+	if err == repository.ErrNotFound {
+		resume.SLADeadline = time.Now().Add(24 * time.Hour)
+	} else if err != nil {
 		return err
+	} else {
+		resume.SLADeadline = time.Now().Add(time.Duration(slaRule.DurationHours) * time.Hour)
 	}
 
-	resume.SLADeadline = time.Now().Add(time.Duration(slaRule.DurationHours) * time.Hour)
 	resume.CurrentStageID = stageID
+	resume.UpdatedAt = time.Now()
 
-	return s.resumeRepo.MoveResumeToStage(ctx, resumeID, stageID)
+	return s.resumeRepo.UpdateResumeByID(ctx, resume)
 }
 
 func (s *ResumeService) GetResumeStats(ctx context.Context) (*models.ResumeStats, error) {
